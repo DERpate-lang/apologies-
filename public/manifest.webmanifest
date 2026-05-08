@@ -1,0 +1,16 @@
+{
+  "name": "إلى نور - مساحة اعتذار ونمو",
+  "short_name": "إلى نور",
+  "description": "مساحة شخصية للاعتذار والنمو والتواصل",
+  "theme_color": "#0c0c0c",
+  "background_color": "#0c0c0c",
+  "display": "standalone",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

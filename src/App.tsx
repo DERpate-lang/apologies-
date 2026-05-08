@@ -4,7 +4,7 @@
  */
 
 import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence } from 'motion/react';
-import { Heart, Stars, Sparkles, Anchor, ChevronDown, CheckCircle2, AlertCircle, Target, Camera, Plus, Trash2, Calendar, Menu, X } from 'lucide-react';
+import { Heart, Stars, Sparkles, Anchor, ChevronDown, CheckCircle2, AlertCircle, Target, Camera, Plus, Trash2, Calendar, Menu, X, WifiOff, Lightbulb } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 
@@ -110,42 +110,99 @@ const PROMISES = [
   }
 ];
 
+const QUALITY_TIME_COMMITMENT = {
+  id: 1,
+  title: "وقت عالي الجودة ومخصص",
+  description: "كل يوم أحد من الساعة 6 مساءً حتى 10 مساءً سيكون وقتنا 'الخالي من التكنولوجيا'. لا هواتف، لا مشتتات، فقط تواصل وانسجام.",
+  goals: {
+    s: "وقت خالٍ من التكنولوجيا لنا.",
+    m: "4 ساعات كل أسبوع.",
+    a: "أيام الأحد هي عادةً أهدأ أيامنا.",
+    r: "لإعادة بناء المودة والاستماع العميق.",
+    t: "بدءاً من يوم الأحد القادم."
+  }
+};
+
+const CONNECTION_SESSIONS_COMMITMENT = {
+  id: 2,
+  title: "جلسات تواصل دورية",
+  description: "سأبدأ جلسة حديث من القلب يومياً. بدلاً من مجرد السؤال 'كيف كان يومك'، سأسأل 'كيف كان قلبك اليوم؟'",
+  goals: {
+    s: "جلسة تواصل عاطفي يومياً.",
+    m: "مرة واحدة كل مساء قبل النوم.",
+    a: "تستغرق فقط 5-10 دقائق.",
+    r: "لمعالجة المشاكل الصغيرة قبل أن تكبر.",
+    t: "يومياً، بدءاً من الليلة."
+  }
+};
+
+const PUNCTUALITY_COMMITMENT = {
+  id: 3,
+  title: "الدقة في المواعيد والاحترام",
+  description: "سأرسل رسالة قبل 15 دقيقة من أي موعد إذا كنت سأتأخر حتى لو لدقيقتين، احتراماً لجدولك.",
+  goals: {
+    s: "تنبيهات مسبقة عن التأخير.",
+    m: "100% من المرات التي أتأخر فيها.",
+    a: "إرسال نص سريع ممكن دائماً.",
+    r: "لإظهار أن وقتك ثمين بالنسبة لي.",
+    t: "يبدأ العمل بهذا فوراً."
+  }
+};
+
 const SMART_COMMITMENTS = [
+  QUALITY_TIME_COMMITMENT,
+  CONNECTION_SESSIONS_COMMITMENT,
+  PUNCTUALITY_COMMITMENT
+];
+
+const OUR_PROGRAMS = [
   {
     id: 1,
-    title: "وقت عالي الجودة ومخصص",
-    description: "كل يوم أحد من الساعة 6 مساءً حتى 10 مساءً سيكون وقتنا 'الخالي من التكنولوجيا'. لا هواتف، لا مشتتات، فقط تواصل وانسجام.",
-    goals: {
-      s: "وقت خالٍ من التكنولوجيا لنا.",
-      m: "4 ساعات كل أسبوع.",
-      a: "أيام الأحد هي عادةً أهدأ أيامنا.",
-      r: "لإعادة بناء المودة والاستماع العميق.",
-      t: "بدءاً من يوم الأحد القادم."
-    }
+    title: "برنامج الحديث المسائي",
+    description: "15 دقيقة كل ليلة لمراجعة مشاعرنا، دون لوم أو دفاع.",
+    icon: <Sparkles className="w-5 h-5" />,
+    color: "accent-gold"
   },
   {
     id: 2,
-    title: "جلسات تواصل دورية",
-    description: "سأبدأ جلسة حديث من القلب يومياً. بدلاً من مجرد السؤال 'كيف كان يومك'، سأسأل 'كيف كان قلبك اليوم؟'",
-    goals: {
-      s: "جلسة تواصل عاطفي يومياً.",
-      m: "مرة واحدة كل مساء قبل النوم.",
-      a: "تستغرق فقط 5-10 دقائق.",
-      r: "لمعالجة المشاكل الصغيرة قبل أن تكبر.",
-      t: "يومياً، بدءاً من الليلة."
-    }
+    title: "برنامج الامتنان اليومي",
+    description: "تبادل رسالة نصية يومية تحتوي على شيء واحد نقدره في بعضنا البعض.",
+    icon: <Heart className="w-5 h-5" />,
+    color: "red-400"
   },
   {
     id: 3,
-    title: "الدقة في المواعيد والاحترام",
-    description: "سأرسل رسالة قبل 15 دقيقة من أي موعد إذا كنت سأتأخر حتى لو لدقيقتين، احتراماً لجدولك.",
-    goals: {
-      s: "تنبيهات مسبقة عن التأخير.",
-      m: "100% من المرات التي أتأخر فيها.",
-      a: "إرسال نص سريع ممكن دائماً.",
-      r: "لإظهار أن وقتك ثمين بالنسبة لي.",
-      t: "يبدأ العمل بهذا فوراً."
-    }
+    title: "برنامج التخطيط الأسبوعي",
+    description: "جلسة تخطيط صباح يوم السبت لتنسيق مواعيدنا وأهدافنا المشتركة.",
+    icon: <Calendar className="w-5 h-5" />,
+    color: "blue-400"
+  }
+];
+
+const LESSONS_LEARNED = [
+  {
+    id: 1,
+    title: "الاستماع هو أعظم هدية",
+    insight: "تعلمت أن الاستماع ليس مجرد صمت في انتظار دوري للتحدث، بل هو تواجد كامل ومحاولة لفهم العالم من منظوركِ أنتِ.",
+    icon: <Heart className="w-5 h-5 text-accent-gold" />
+  },
+  {
+    id: 2,
+    title: "الاعتذار هو بداية وليس نهاية",
+    insight: "أدركت أن قول 'أنا آسف' هو فقط فتح للباب؛ التغيير الحقيقي والاتساق في الأفعال هو ما يبني الثقة من جديد.",
+    icon: <CheckCircle2 className="w-5 h-5 text-accent-gold" />
+  },
+  {
+    id: 3,
+    title: "التواصل هو جسر الأمان",
+    insight: "الحديث عن المشاعر الصغيرة والاحتياجات بوضوح يمنع تراكم التوترات ويجعل علاقتنا حصينة ضد سوء الفهم.",
+    icon: <Sparkles className="w-5 h-5 text-accent-gold" />
+  },
+  {
+    id: 4,
+    title: "التقدير اليومي يغير كل شيء",
+    insight: "التركيز على الجميل فيكِ وفي يومنا معاً ينمي المودة ويجعلني أراكِ دائماً كأهم وأجمل ما في حياتي.",
+    icon: <Stars className="w-5 h-5 text-accent-gold" />
   }
 ];
 
@@ -190,12 +247,33 @@ export default function App() {
   const [newEvidence, setNewEvidence] = useState({ content: '', note: '' });
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [lovelyMessage, setLovelyMessage] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    fetch('/api/evidence')
-      .then(res => res.json())
-      .then(data => setEvidence(data))
-      .catch(err => console.error("Failed to load evidence:", err));
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Initial fetch
+    const loadEvidence = async () => {
+      try {
+        const res = await fetch('/api/evidence');
+        if (res.ok) {
+          const data = await res.json();
+          setEvidence(data);
+        }
+      } catch (err) {
+        console.error("Failed to load evidence:", err);
+      }
+    };
+    loadEvidence();
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   const showRandomMessage = () => {
@@ -309,8 +387,8 @@ export default function App() {
               <X className="w-8 h-8" />
             </button>
             <nav className="flex flex-col gap-8 text-center">
-              {['البداية', 'الأخطاء', 'الوعود', 'الالتزامات', 'أدلة التغيير', 'لحظاتنا'].map((item, i) => {
-                const ids = ['hero', 'regrets', 'promises', 'commitments', 'evidence', 'ai-moments'];
+              {['البداية', 'الأخطاء', 'الوعود', 'الالتزامات', 'برامجنا', 'أدلة التغيير', 'ما تعلمته', 'لحظاتنا'].map((item, i) => {
+                const ids = ['hero', 'regrets', 'promises', 'commitments', 'programs', 'evidence', 'lessons', 'ai-moments'];
                 return (
                   <button
                     key={item}
@@ -335,6 +413,21 @@ export default function App() {
       >
         <Menu className="w-5 h-5 text-accent-gold" />
       </button>
+
+      {/* Offline Indicator */}
+      <AnimatePresence>
+        {!isOnline && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="fixed bottom-8 left-8 z-40 bg-red-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-red-500/20 flex items-center gap-2 pointer-events-none"
+          >
+            <WifiOff className="w-3 h-3 text-red-500" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-red-500">أنت في وضع عدم الاتصال</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hero Section */}
       <section id="hero" className="relative h-screen flex flex-col items-center justify-center overflow-hidden px-6">
@@ -535,6 +628,48 @@ export default function App() {
         </div>
       </section>
 
+      {/* Shared Programs Section */}
+      <section id="programs" className="py-32 px-6 bg-bg-dark border-b border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <header className="mb-20 flex flex-col items-center text-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-blue-900/40 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-6"
+            >
+              <Target className="w-3 h-3" />
+              خرائط طريق للنمو
+            </motion.div>
+            <h2 className="serif text-5xl md:text-7xl text-white italic underline decoration-blue-500/20 decoration-8 underline-offset-[12px]">برامج التغيير</h2>
+            <p className="text-white/40 mt-10 max-w-2xl text-lg leading-relaxed">
+              هذه ليست مجرد وعود، بل أنظمة حياة سنطبقها معاً لضمان عدم العودة للوراء.
+            </p>
+          </header>
+
+          <div className="grid md:grid-cols-3 gap-8 text-right">
+            {OUR_PROGRAMS.map((program, index) => (
+              <motion.div
+                key={program.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/5 border border-white/10 p-10 rounded-sm hover:border-blue-500/40 transition-all group"
+              >
+                <div className="mb-8 p-4 bg-white/5 w-fit rounded-full group-hover:scale-110 transition-transform mr-0 ml-auto">
+                   {React.cloneElement(program.icon as React.ReactElement, { className: `w-6 h-6 text-accent-gold` })}
+                </div>
+                <h3 className="serif text-2xl text-white mb-4 italic">{program.title}</h3>
+                <p className="text-white/50 text-sm leading-relaxed">
+                  {program.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Evidence of Growth Section */}
       <section id="evidence" className="py-32 px-6 bg-bg-dark">
         <div className="max-w-5xl mx-auto">
@@ -553,17 +688,20 @@ export default function App() {
             </div>
             
             {/* Simple Growth Logger */}
-            <form onSubmit={addEvidence} className="w-full lg:w-auto bg-white/5 p-6 rounded-sm border border-white/10 flex flex-col gap-4 text-right">
+            <form onSubmit={addEvidence} id="evidence-form" className="w-full lg:w-auto bg-white/5 p-6 rounded-sm border border-white/10 flex flex-col gap-4 text-right">
               <div className="flex flex-col gap-2">
                  <input 
+                  id="evidence-input-main"
                   type="text" 
                   dir="rtl"
                   value={newEvidence.content}
                   onChange={e => setNewEvidence({...newEvidence, content: e.target.value})}
                   placeholder="صفي لحظة من التغيير..."
                   className="bg-transparent border-b border-white/20 pb-2 text-sm focus:border-accent-gold outline-none transition-colors w-full lg:w-80"
+                  required
                 />
                  <input 
+                  id="evidence-input-note"
                   type="text" 
                   dir="rtl"
                   value={newEvidence.note}
@@ -573,8 +711,10 @@ export default function App() {
                 />
               </div>
               <button 
+                id="evidence-submit-btn"
                 type="submit"
-                className="bg-accent-gold text-bg-dark px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-colors flex items-center justify-center gap-2"
+                className="bg-accent-gold text-bg-dark px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!newEvidence.content}
               >
                 <Plus className="w-3 h-3" />
                 تسجيل التغيير
@@ -620,6 +760,62 @@ export default function App() {
               ))}
             </AnimatePresence>
           </div>
+        </div>
+      </section>
+
+      {/* What I've Learned Section */}
+      <section id="lessons" className="py-32 px-6 bg-surface-dark border-y border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <header className="mb-20 flex flex-col items-center text-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-accent-gold/40 text-accent-gold text-[10px] font-bold uppercase tracking-[0.2em] mb-6"
+            >
+              <Lightbulb className="w-3 h-3" />
+              رؤى ونمو
+            </motion.div>
+            <h2 className="serif text-5xl md:text-7xl text-white italic underline decoration-accent-gold/20 decoration-8 underline-offset-[12px]">ما تعلمته في الرحلة</h2>
+            <p className="text-white/40 mt-10 max-w-2xl text-lg leading-relaxed">
+              هذه هي الدروس العميقة التي استخلصتها من مراجعتي لنفسي ومن خلال حبي لكِ. كل نقطة هي عهد جديد بفهم أعمق.
+            </p>
+          </header>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {LESSONS_LEARNED.map((lesson, index) => (
+              <motion.div
+                key={lesson.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+                className="bg-white/5 border border-white/10 p-8 rounded-sm text-right group hover:bg-white/10 transition-all"
+              >
+                <div className="flex items-center gap-4 mb-6 justify-end">
+                  <h3 className="serif text-2xl text-white italic">{lesson.title}</h3>
+                  <div className="p-3 bg-accent-gold/10 rounded-full group-hover:scale-110 transition-transform">
+                    {lesson.icon}
+                  </div>
+                </div>
+                <p className="text-white/60 text-lg leading-relaxed font-serif italic pr-4 border-r border-accent-gold/20">
+                  {lesson.insight}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+          
+          <motion.div 
+             initial={{ opacity: 0 }}
+             whileInView={{ opacity: 1 }}
+             viewport={{ once: true }}
+             className="mt-20 p-12 bg-accent-gold/5 border border-accent-gold/20 rounded-sm text-center"
+          >
+             <p className="serif text-2xl text-accent-gold italic leading-relaxed">
+               "النمو الحقيقي ليس في تجنب الأخطاء، بل في القدرة على التعلم منها وبناء غدٍ أكثر حبا وتفهما."
+             </p>
+          </motion.div>
         </div>
       </section>
 
