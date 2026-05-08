@@ -8,8 +8,6 @@ import { Heart, Stars, Sparkles, Anchor, ChevronDown, CheckCircle2, AlertCircle,
 import React, { useRef, useState, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 const FloatingHearts = () => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -212,7 +210,13 @@ export default function App() {
   const generateMemoryImage = async () => {
     try {
       setIsGenerating(true);
-      const prompt = "A cute, romantic cartoon illustration of a young couple, a man and a woman named Noor, sharing a sweet and sincere moment of apology and love. Soft pastel colors, whimsical art style, expressive faces, cozy atmosphere.";
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("GEMINI_API_KEY is not defined in the environment.");
+      }
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const prompt = "A cute, romantic cartoon illustration of a young couple, a man and a woman named Noor, sharing a sweet and sincere moment of apology and love. Soft pastel colors, whimsical art style, expressive faces, cozy atmosphere, symbolic floating hearts, warm sunset background.";
       
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
