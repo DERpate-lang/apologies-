@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Amiri", serif;
+  --font-sans: "Inter", sans-serif;
+  
+  --color-bg-dark: #0c0c0c;
+  --color-text-main: #e0e0e0;
+  --color-accent-gold: #c5a059;
+  --color-border-gold: rgba(197, 160, 89, 0.3);
+  --color-surface-light: #111111;
+  --color-surface-dark: #0e0e0e;
+  --color-footer-dark: #0a0a0a;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+/* Smooth scroll for the whole page */
+html {
+  scroll-behavior: smooth;
+}
