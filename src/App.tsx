@@ -692,6 +692,7 @@ export default function App() {
               <div className="flex flex-col gap-2">
                  <input 
                   id="evidence-input-main"
+                  aria-label="Describe your growth moment"
                   type="text" 
                   dir="rtl"
                   value={newEvidence.content}
