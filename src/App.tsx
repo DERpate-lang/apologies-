@@ -6,6 +6,9 @@
 import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence } from 'motion/react';
 import { Heart, Stars, Sparkles, Anchor, ChevronDown, CheckCircle2, AlertCircle, Target, Camera, Plus, Trash2, Calendar, Menu, X } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const FloatingHearts = () => {
   const mouseX = useMotionValue(0);
@@ -185,10 +188,17 @@ const LOVELY_MESSAGES = [
 
 export default function App() {
   const containerRef = useRef(null);
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const [evidence, setEvidence] = useState<EvidenceItem[]>(INITIAL_EVIDENCE);
+  const [evidence, setEvidence] = useState<EvidenceItem[]>([]);
   const [newEvidence, setNewEvidence] = useState({ content: '', note: '' });
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [lovelyMessage, setLovelyMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/evidence')
+      .then(res => res.json())
+      .then(data => setEvidence(data))
+      .catch(err => console.error("Failed to load evidence:", err));
+  }, []);
 
   const showRandomMessage = () => {
     const random = LOVELY_MESSAGES[Math.floor(Math.random() * LOVELY_MESSAGES.length)];
@@ -196,24 +206,76 @@ export default function App() {
     setTimeout(() => setLovelyMessage(null), 5000); // Hide after 5s
   };
 
-  const addEvidence = (e: React.FormEvent) => {
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generateMemoryImage = async () => {
+    try {
+      setIsGenerating(true);
+      const prompt = "A cute, romantic cartoon illustration of a young couple, a man and a woman named Noor, sharing a sweet and sincere moment of apology and love. Soft pastel colors, whimsical art style, expressive faces, cozy atmosphere.";
+      
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+          parts: [{ text: prompt }]
+        },
+        config: {
+          imageConfig: {
+            aspectRatio: "1:1"
+          }
+        }
+      });
+
+      const candidates = response.candidates;
+      if (candidates && candidates[0]?.content?.parts) {
+        for (const part of candidates[0].content.parts) {
+          if (part.inlineData) {
+            setGeneratedImage(`data:image/png;base64,${part.inlineData.data}`);
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Image generation failed:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const addEvidence = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEvidence.content) return;
     
-    const item: EvidenceItem = {
-      id: Date.now().toString(),
-      type: 'action',
-      content: newEvidence.content,
-      note: newEvidence.note,
-      date: new Date().toLocaleDateString('ar-EG')
-    };
-    
-    setEvidence([item, ...evidence]);
-    setNewEvidence({ content: '', note: '' });
+    try {
+      const response = await fetch('/api/evidence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'action',
+          content: newEvidence.content,
+          note: newEvidence.note
+        })
+      });
+      
+      if (response.ok) {
+        const newItem = await response.json();
+        setEvidence([newItem, ...evidence]);
+        setNewEvidence({ content: '', note: '' });
+      }
+    } catch (err) {
+      console.error("Failed to add evidence:", err);
+    }
   };
 
-  const removeEvidence = (id: string) => {
-    setEvidence(evidence.filter(e => e.id !== id));
+  const removeEvidence = async (id: string) => {
+    try {
+      const response = await fetch(`/api/evidence/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setEvidence(evidence.filter(e => e.id !== id));
+      }
+    } catch (err) {
+      console.error("Failed to remove evidence:", err);
+    }
   };
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -243,8 +305,8 @@ export default function App() {
               <X className="w-8 h-8" />
             </button>
             <nav className="flex flex-col gap-8 text-center">
-              {['البداية', 'الأخطاء', 'الوعود', 'الالتزامات', 'أدلة التغيير'].map((item, i) => {
-                const ids = ['hero', 'regrets', 'promises', 'commitments', 'evidence'];
+              {['البداية', 'الأخطاء', 'الوعود', 'الالتزامات', 'أدلة التغيير', 'لحظاتنا'].map((item, i) => {
+                const ids = ['hero', 'regrets', 'promises', 'commitments', 'evidence', 'ai-moments'];
                 return (
                   <button
                     key={item}
@@ -554,6 +616,74 @@ export default function App() {
               ))}
             </AnimatePresence>
           </div>
+        </div>
+      </section>
+
+      {/* AI Memory Generator Section */}
+      <section id="ai-moments" className="py-32 px-6 bg-surface-light border-y border-white/5 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <header className="mb-16">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-accent-gold/40 text-accent-gold text-[10px] font-bold uppercase tracking-[0.2em] mb-6"
+            >
+              <Sparkles className="w-3 h-3" />
+              سحر الذكاء الاصطناعي
+            </motion.div>
+            <h2 className="serif text-5xl md:text-7xl text-white italic">لحظاتنا الكرتونية</h2>
+            <p className="text-white/40 mt-8 max-w-xl mx-auto text-lg font-serif italic">
+              ضغطة زر واحدة لتوليد صورة كرتونية تعبر عن حبنا واعتذاري لكِ.
+            </p>
+          </header>
+
+          <div className="flex flex-col items-center gap-12">
+            <div className="relative w-full max-w-md aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center group shadow-2xl">
+              {generatedImage ? (
+                <motion.img 
+                  src={generatedImage} 
+                  initial={{ opacity: 0, scale: 1.1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="w-full h-full object-cover"
+                  alt="Generated memory"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="text-white/20 flex flex-col items-center gap-4">
+                  <Camera className="w-16 h-16 opacity-20 group-hover:scale-110 transition-transform duration-700" />
+                  <span className="text-xs uppercase tracking-widest">اضغطي بالأسفل لتوليد اللحظة</span>
+                </div>
+              )}
+              
+              {isGenerating && (
+                <div className="absolute inset-0 bg-bg-dark/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-20">
+                  <motion.div 
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="w-12 h-12 border-2 border-accent-gold/20 border-t-accent-gold rounded-full"
+                  />
+                  <span className="text-accent-gold text-[10px] uppercase tracking-widest animate-pulse">جاري رسم ذكرياتنا...</span>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={generateMemoryImage}
+              disabled={isGenerating}
+              className="group relative px-12 py-5 bg-accent-gold text-bg-dark text-sm font-bold uppercase tracking-[0.3em] overflow-hidden transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:grayscale"
+            >
+              <span className="relative z-10 flex items-center gap-3">
+                {isGenerating ? "جاري الرسم..." : "توليد صورة كرتونية"}
+                <Sparkles className="w-4 h-4" />
+              </span>
+              <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-10" />
+            </button>
+          </div>
+        </div>
+        
+        <div className="absolute -bottom-24 -left-24 opacity-5 pointer-events-none">
+          <Heart className="w-96 h-96 text-accent-gold fill-accent-gold" />
         </div>
       </section>
 
